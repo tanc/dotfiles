@@ -1,0 +1,87 @@
+[user]
+  name = tanc
+  email = mail@tanc.me
+
+[github]
+  user = tanc
+
+[diff]
+  renames = copies
+
+[alias]
+  br = branch
+  cb = "!sh -c 'git branch $1 && git ch $1' -"
+  ctb = "!sh -c 'git cb topics/$1' -"
+
+  ci = commit
+  ch = checkout
+  co = checkout
+  fc = commit -am 'Initial commit.'
+  cpush = "!sh -c 'git commit -au -m \"$1\" && git push -u origin' -"
+  d = diff
+  s = status --short
+
+  unstage = reset HEAD              # remove files from index (tracking)
+  uncommit = reset --soft HEAD^     # go back before last commit, with files in uncommitted state
+
+  # via http://blog.apiaxle.com/post/handy-git-tips-to-stop-you-getting-fired/
+  snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+  snapshots = !git stash list --grep snapshot
+
+  #via http://stackoverflow.com/questions/5188320/how-can-i-get-a-list-of-git-branches-ordered-by-most-recent-commit
+  recent-branches = !git for-each-ref --count=5 --sort=-committerdate refs/heads/ --format='%(refname:short)'
+
+  l = log --graph --date=short
+  changes = log --pretty=format:\"%h %cr %cn %Cgreen%s%Creset\" --name-status
+  graph = log --graph
+  short = log --pretty=format:\"%h %cr %cn %Cgreen%s%Creset\"
+  simple = log --pretty=format:\" * %s\"
+  last = log -n 10
+  url = !git remote -v|sed "'s|.*git[:@]\\(.*\\).git.*|http://\\1|;s|m:|m/|'"|uniq|xargs open
+  whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+  discard = checkout -- .
+  rmtag = "!sh -c 'git tag -d $1; git push origin :refs/tags/$1'"
+
+  pr = "!f() { git fetch -fu ${2:-origin} refs/pull/$1/head:pr/$1; } ; f"
+
+[push]
+  default = current
+
+[color]
+  ui = true
+
+[core]
+  editor = vim
+  excludesfile = ~/.gitignore
+  autocrlf = false
+  safecrlf = false
+  ignorecase = false
+
+[branch]
+  autosetuprebase = always
+
+[format]
+  # pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
+  graph = true
+
+[advice]
+  statusHints = false
+
+[log]
+  abbrevCommit = true
+
+# URL shorthands
+# gh:paulmillr/dotfiles
+[url "git@github.com:"]
+  insteadOf = "gh:"
+  pushInsteadOf = "gh:"
+  pushInsteadOf = "git://github.com/"
+
+# gist:3928760
+[url "git@gist.github.com:"]
+  insteadOf = "gist:"
+  pushInsteadOf = "gist:"
+  pushInsteadOf = "git://gist.github.com/"
+
+[mergetool]
+	keepBackup = true

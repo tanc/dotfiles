@@ -1,0 +1,5 @@
+.ssh/prod_id_coopsuk
+.ssh/id_rsa
+.ssh/id_coopsuk
+.ssh/passbolt_private.asc.txt
+.ssh/config
