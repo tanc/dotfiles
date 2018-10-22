@@ -3,7 +3,7 @@ edc/bass
 oh-my-fish/theme-bobthefish
 barnybug/docker-fish-completion
 fisherman/done
-oh-my-fish/plugin-fasd
+tofagerl/fasd
 fisherman/fzy
 fisherman/getopts
 fisherman/gitignore
