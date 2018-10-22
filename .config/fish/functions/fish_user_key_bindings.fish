@@ -1,3 +1,5 @@
+
+fzf_key_bindings
 function fish_user_key_bindings
     ### user ###
     bind \e\[A 'history --merge ; up-or-search'
@@ -9,7 +11,6 @@ function fish_user_key_bindings
     ### bang-bang ###
     ### fzy ###
     bind \cr 'fzy_select_history (commandline -b)'
+    bind \cf 'fzy_select_directory'
     ### fzy ###
 end
-
-fzf_key_bindings
