@@ -1,0 +1,7 @@
+#!/bin/bash
+
+system_type=$(uname -s)
+
+if [ ! -f ~/.config/fish/functions/fzf_key_bindings.fish ]; then
+  ln -s ~/.config/nvim/pack/minpac/start/fzf/shell/key-bindings.fish ~/.config/fish/functions/fzf_key_bindings.fish
+fi
