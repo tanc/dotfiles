@@ -23,6 +23,7 @@
 
   unstage = reset HEAD              # remove files from index (tracking)
   uncommit = reset --soft HEAD^     # go back before last commit, with files in uncommitted state
+  conflicts = diff --name-only --diff-filter=U # show a list of conflicted files
 
   # via http://blog.apiaxle.com/post/handy-git-tips-to-stop-you-getting-fired/
   snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
@@ -53,7 +54,7 @@
 [core]
   editor = vim
   excludesfile = ~/.config/git/gitignore
-  autocrlf = false
+	autocrlf = input
   safecrlf = false
   ignorecase = false
 
