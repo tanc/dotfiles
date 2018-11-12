@@ -3,12 +3,21 @@ augroup vimrc
   autocmd!
 augroup END
 
+if &term =~ '256color'
+  " disable Background Color Erase (BCE) so that color schemes
+  " render properly when inside 256-color tmux and GNU screen.
+  " see also http://snk.tuxfamily.org/log/vim-256color-bce.html
+  set t_ut=
+endif
+
 let mapleader = "\<Space>"
 
 " Set up minpac
 packadd minpac
 call minpac#init()
 call minpac#add('k-takata/minpac', {'type': 'opt'})
+
+" Various plugins
 call minpac#add('tpope/vim-unimpaired')
 call minpac#add('junegunn/fzf')
 call minpac#add('junegunn/fzf.vim')
@@ -20,6 +29,11 @@ call minpac#add('2072/PHP-Indenting-for-VIm')
 call minpac#add('vim-vdebug/vdebug')
 call minpac#add('posva/vim-vue')
 call minpac#add('phpactor/phpactor',  {'do': '!composer install', 'for': 'php', 'type': 'opt'})
+call minpac#add('lumiliet/vim-twig', {'for': 'twig'})
+call minpac#add('w0rp/ale')
+call minpac#add('maximbaz/lightline-ale')
+call minpac#add('cj/vim-webdevicons')
+call minpac#add('tpope/vim-commentary')
 
 " Ultisnips
 call minpac#add('SirVer/ultisnips')
@@ -34,31 +48,48 @@ call minpac#add('ncm2/ncm2-tmux')
 call minpac#add('ncm2/ncm2-path')
 call minpac#add('ncm2/ncm2-ultisnips')
 call minpac#add('ncm2/ncm2-go', {'for': 'go', 'type': 'opt'})
-call minpac#add('ncm2/ncm2-cssomni', {'for': 'css', 'type': 'opt'})
+call minpac#add('ncm2/ncm2-cssomni', {'type': 'opt'})
 call minpac#add('phpactor/ncm2-phpactor', {'for': 'php', 'type': 'opt'})
 call minpac#add('ncm2/ncm2-jedi', {'for': 'python', 'type': 'opt'})
 call minpac#add('ncm2/ncm2-tern',  {'do': '!npm install', 'for': 'javascript', 'type': 'opt'})
 call minpac#add('ncm2/nvim-typescript', {'do': '!./install.sh', 'for': 'typescript', 'type': 'opt'})
 
+" ncm2
 augroup NCM2
   au!
   autocmd BufEnter * call ncm2#enable_for_buffer()
-  au User Ncm2PopupOpen set completeopt=noinsert,menuone,preview
+  au User Ncm2PopupOpen set completeopt=noinsert,menuone
   au User Ncm2PopupClose set completeopt=menuone
-  " Use <TAB> to select the popup menu:
-  inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-  inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 augroup END
+
+" CTRL-C doesn't trigger the InsertLeave autocmd. Map to <ESC> instead.
+inoremap <c-c> <ESC>
+
+" When the <Enter> key is pressed while the popup menu is visible, it only
+" hides the menu. Use this mapping to close the menu and also start a new
+" line.
+inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+
+" Use <TAB> to select the popup menu:
+inoremap <expr> <Tab> pumvisible() ? "\<c-y>" : "\<Tab>"
+inoremap <silent> <expr> <Tab> ncm2_ultisnips#expand_or("\<c-y>", 'n')
+"let g:UltiSnipsJumpForwardTrigger	= "<c-j>"
+"let g:UltiSnipsJumpBackwardTrigger	= "<c-k>"
+let g:UltiSnipsRemoveSelectModeMappings = 0
+let g:UltiSnipsExpandTrigger = '<c-j>'
 
 augroup PackFTLoad
 	autocmd!
 	autocmd FileType php packadd phpactor
 	autocmd FileType php packadd ncm2-phpactor
-  autocmd FileType javascript packadd ncm2-tern
+  autocmd FileType javascript,vue packadd ncm2-tern
   autocmd FileType typescript packadd nvim-typescript
   autocmd FileType python packadd ncm2-jedi
   autocmd FileType go packadd ncm2-go
-  autocmd FileType css packadd ncm2-cssomni
+  autocmd FileType css,scss,sass packadd ncm2-cssomni
+  " Ultisnips extras per filetype
+  autocmd FileType css,scss,sass UltiSnipsAddFiletypes css
+  autocmd FileType vue UltiSnipsAddFiletypes vue
 augroup END
 
 "" phpactor mappings
@@ -82,7 +113,7 @@ vmap <silent><Leader>ee :<C-U>call phpactor#ExtractExpression(v:true)<CR>
 vmap <silent><Leader>em :<C-U>call phpactor#ExtractMethod()<CR>
 
 " Add some useful commands for package management
-command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update('', {'do': 'call minpac#status()'})
+command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
 command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
 command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
 
@@ -106,6 +137,65 @@ let g:NERDTreeCascadeSingleChildDir=0
 let g:NERDTreeAutoDeleteBuffer=1
 nnoremap <leader>n :NERDTreeToggle<cr>
 nnoremap <leader>N :NERDTreeFind<cr>
+
+" Lightline config
+set encoding=utf8
+let g:lightline = {
+      \ 'colorscheme': 'powerline',
+      \ }
+
+let g:lightline.component_expand = {
+      \  'linter_checking': 'lightline#ale#checking',
+      \  'linter_warnings': 'lightline#ale#warnings',
+      \  'linter_errors': 'lightline#ale#errors',
+      \  'linter_ok': 'lightline#ale#ok',
+      \ }
+
+let g:lightline.component_type = {
+      \     'linter_checking': 'left',
+      \     'linter_warnings': 'warning',
+      \     'linter_errors': 'error',
+      \     'linter_ok': 'left',
+      \ }
+
+let g:lightline.component_function = {
+      \     'obsession': 'MyObsession',
+      \     'filetype': 'MyFiletype',
+      \     'fileformats': 'MyFileformat',
+      \ }
+
+let g:lightline#ale#indicator_checking = "\uf110"
+let g:lightline#ale#indicator_warnings = "\uf071"
+let g:lightline#ale#indicator_errors = "\uf05e"
+let g:lightline#ale#indicator_ok = "\uf00c"
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {}
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['js'] = ''
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['php']= ''
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['html'] = ''
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['scss'] = ''
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['sass'] = ''
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['css'] = ''
+
+let g:lightline.active = { 'right': [ [ 'lineinfo' ], [ 'percent' ], [ 'fileformat', 'filetype' ], [ 'obsession', 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]] }
+
+function! MyFiletype()
+  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
+endfunction
+
+function! MyFileformat()
+  return winwidth(0) > 70 ? (&fileformat . ' ' . WebDevIconsGetFileFormatSymbol()) : ''
+endfunction
+
+function! MyObsession()
+  if exists("*ObsessionStatus")
+    return ObsessionStatus('●', '○')
+  endif
+  return ''
+endfunction
+
+" Ale config
+let g:ale_php_phpcs_standard = 'Drupal'
+let g:ale_php_phpcbf_standard = 'Drupal'
 
 " Tabs and indents
 set expandtab
@@ -161,4 +251,7 @@ endif
 let g:vdebug_options.break_on_open = 0
 
 " VIM colours
-highlight LineNr ctermfg=233
+" let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+" let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
+" set termguicolors
+" highlight LineNr ctermfg=233
