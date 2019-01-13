@@ -18,6 +18,8 @@ call minpac#init()
 call minpac#add('k-takata/minpac', {'type': 'opt'})
 
 " Various plugins
+call minpac#add('patstockwell/vim-monokai-tasty')
+call minpac#add('pangloss/vim-javascript')
 call minpac#add('tpope/vim-unimpaired')
 call minpac#add('junegunn/fzf')
 call minpac#add('junegunn/fzf.vim')
@@ -26,7 +28,7 @@ call minpac#add('tiagofumo/vim-nerdtree-syntax-highlight')
 call minpac#add('itchyny/lightline.vim')
 call minpac#add('moll/vim-bbye')
 call minpac#add('2072/PHP-Indenting-for-VIm')
-call minpac#add('vim-vdebug/vdebug')
+call minpac#add('tanc/vdebug', {'branch': 'phpstorm-style'})
 call minpac#add('posva/vim-vue')
 call minpac#add('phpactor/phpactor',  {'do': '!composer install', 'for': 'php', 'type': 'opt'})
 call minpac#add('lumiliet/vim-twig', {'for': 'twig'})
@@ -34,6 +36,8 @@ call minpac#add('w0rp/ale')
 call minpac#add('maximbaz/lightline-ale')
 call minpac#add('cj/vim-webdevicons')
 call minpac#add('tpope/vim-commentary')
+call minpac#add('hail2u/vim-css3-syntax', {'type': 'opt'})
+call minpac#add('cakebaker/scss-syntax.vim', {'type': 'opt'})
 
 " Ultisnips
 call minpac#add('SirVer/ultisnips')
@@ -86,10 +90,12 @@ augroup PackFTLoad
   autocmd FileType typescript packadd nvim-typescript
   autocmd FileType python packadd ncm2-jedi
   autocmd FileType go packadd ncm2-go
-  autocmd FileType css,scss,sass packadd ncm2-cssomni
+  autocmd FileType css,scss,sass,vue packadd ncm2-cssomni
   " Ultisnips extras per filetype
   autocmd FileType css,scss,sass UltiSnipsAddFiletypes css
   autocmd FileType vue UltiSnipsAddFiletypes vue
+  autocmd FileType css,scss,sass,vue packadd vim-css3-syntax
+  autocmd FileType css,scss,sass,vue packadd scss-syntax.vim
 augroup END
 
 "" phpactor mappings
@@ -121,6 +127,9 @@ command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
 nnoremap <C-p> :<C-u>FZF<CR>
 nnoremap ” gT
 nnoremap ’ gt
+
+" Colourscheme
+colorscheme vim-monokai-tasty
 
 " tmux
 call minpac#add('christoomey/vim-tmux-navigator')
@@ -193,6 +202,16 @@ function! MyObsession()
   return ''
 endfunction
 
+" Drupal Config
+augroup module
+  autocmd BufRead,BufNewFile *.module set filetype=php
+  autocmd BufRead,BufNewFile *.install set filetype=php
+  autocmd BufRead,BufNewFile *.test set filetype=php
+  autocmd BufRead,BufNewFile *.inc set filetype=php
+  autocmd BufRead,BufNewFile *.profile set filetype=php
+  autocmd BufRead,BufNewFile *.view set filetype=php
+augroup END
+
 " Ale config
 let g:ale_php_phpcs_standard = 'Drupal'
 let g:ale_php_phpcbf_standard = 'Drupal'
@@ -249,9 +268,16 @@ if !exists('g:vdebug_options')
   let g:vdebug_options = {}
 endif
 let g:vdebug_options.break_on_open = 0
+let g:vdebug_options.window_commands = {
+      \   'DebuggerWatch': 'below new',
+      \   'DebuggerStack': 'belowright new',
+      \   'DebuggerStatus': 'vertical leftabove new'
+      \ }
+
+let g:vdebug_options.window_arrangement = ["DebuggerWatch", "DebuggerStatus", "DebuggerStack"]
 
 " VIM colours
 " let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
 " let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
 " set termguicolors
-" highlight LineNr ctermfg=233
+highlight LineNr ctermfg=233
