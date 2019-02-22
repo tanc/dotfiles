@@ -56,3 +56,10 @@ tags
 
 
 # End of https://www.gitignore.io/api/vim
+
+# VSCode
+.vscode
+
+# Ignore Lando override file
+.lando.local.yml
+
