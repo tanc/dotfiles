@@ -281,3 +281,11 @@ let g:vdebug_options.window_arrangement = ["DebuggerWatch", "DebuggerStatus", "D
 " let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
 " set termguicolors
 highlight LineNr ctermfg=233
+
+augroup vimrc
+  autocmd!
+  autocmd ColorScheme * highlight Normal ctermbg=NONE guibg=NONE
+augroup END
+
+set exrc
+set secure
