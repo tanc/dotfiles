@@ -19,6 +19,7 @@ call minpac#add('k-takata/minpac', {'type': 'opt'})
 
 " Various plugins
 call minpac#add('patstockwell/vim-monokai-tasty')
+call minpac#add('ntpeters/vim-better-whitespace')
 call minpac#add('pangloss/vim-javascript')
 call minpac#add('tpope/vim-unimpaired')
 call minpac#add('junegunn/fzf')
@@ -224,7 +225,7 @@ set autoindent
 set smartindent
 
 " Remove the pipe character from splits
-set fillchars+=vert:\ 
+set fillchars+=vert:\
 
 " Location of swap, backup, undo files
 set undofile
@@ -285,6 +286,9 @@ highlight LineNr ctermfg=233
 augroup vimrc
   autocmd!
   autocmd ColorScheme * highlight Normal ctermbg=NONE guibg=NONE
+  let g:better_whitespace_enabled=1
+  let g:strip_whitespace_on_save=1
+  let g:strip_whitespace_confirm=0
 augroup END
 
 set exrc
