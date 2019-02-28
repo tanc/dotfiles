@@ -39,6 +39,7 @@ call minpac#add('cj/vim-webdevicons')
 call minpac#add('tpope/vim-commentary')
 call minpac#add('hail2u/vim-css3-syntax', {'type': 'opt'})
 call minpac#add('cakebaker/scss-syntax.vim', {'type': 'opt'})
+call minpac#add('mileszs/ack.vim')
 
 " Ultisnips
 call minpac#add('SirVer/ultisnips')
@@ -289,6 +290,9 @@ augroup vimrc
   let g:better_whitespace_enabled=1
   let g:strip_whitespace_on_save=1
   let g:strip_whitespace_confirm=0
+  if executable('ag')
+    let g:ackprg = 'ag --vimgrep'
+  endif
 augroup END
 
 set exrc
