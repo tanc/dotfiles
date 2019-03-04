@@ -36,7 +36,7 @@ call minpac#add('lumiliet/vim-twig', {'for': 'twig'})
 call minpac#add('w0rp/ale')
 call minpac#add('maximbaz/lightline-ale')
 call minpac#add('cj/vim-webdevicons')
-call minpac#add('tpope/vim-commentary')
+call minpac#add('tomtom/tcomment_vim')
 call minpac#add('hail2u/vim-css3-syntax', {'type': 'opt'})
 call minpac#add('cakebaker/scss-syntax.vim', {'type': 'opt'})
 call minpac#add('mileszs/ack.vim')
@@ -66,23 +66,44 @@ augroup NCM2
   autocmd BufEnter * call ncm2#enable_for_buffer()
   au User Ncm2PopupOpen set completeopt=noinsert,menuone
   au User Ncm2PopupClose set completeopt=menuone
+
+  " CTRL-C doesn't trigger the InsertLeave autocmd. Map to <ESC> instead.
+  inoremap <c-c> <ESC>
+
+  " When the <Enter> key is pressed while the popup menu is visible
+  " the menu and add a newline.
+  inoremap <expr> <CR> (pumvisible() ? "\<c-e>\<cr>" : "\<CR>")
+
+  " UltiSnips+NCM function parameter expansion
+
+  " We don't really want UltiSnips to map these two, but there's no option for
+  " that so just make it map them to a <Plug> key.
+  let g:UltiSnipsExpandTrigger       = "<Plug>(ultisnips_expand_or_jump)"
+  let g:UltiSnipsJumpForwardTrigger  = "<Plug>(ultisnips_expand_or_jump)"
+  " Let UltiSnips bind the jump backward trigger as there's nothing special
+  " about it.
+  let g:UltiSnipsJumpBackwardTrigger = "<S-Tab>"
+
+  " Try expanding snippet or jumping with UltiSnips.
+  function! UltiSnipsExpandOrJumpOrTab()
+    call UltiSnips#ExpandSnippetOrJump()
+    return ""
+  endfunction
+
+  " First try expanding with ncm2_ultisnips. This does both LSP snippets and
+  " normal snippets when there's a completion popup visible.
+  inoremap <silent> <expr> <Tab> pumvisible() ? ncm2_ultisnips#expand_or("\<Plug>(ultisnips_try_expand)") : "<Tab>"
+
+  " If that failed, try the UltiSnips expand or jump function. This handles
+  " short snippets when the completion popup isn't visible yet as well as
+  " jumping forward from the insert mode. Writes <Tab> if there is no special
+  " action taken.
+  inoremap <silent> <Plug>(ultisnips_try_expand) <C-R>=UltiSnipsExpandOrJumpOrTab()<CR>
+
+  " Select mode mapping for jumping forward with <Tab>.
+  snoremap <silent> <Tab> <Esc>:call UltiSnips#ExpandSnippetOrJump()<cr>
+
 augroup END
-
-" CTRL-C doesn't trigger the InsertLeave autocmd. Map to <ESC> instead.
-inoremap <c-c> <ESC>
-
-" When the <Enter> key is pressed while the popup menu is visible, it only
-" hides the menu. Use this mapping to close the menu and also start a new
-" line.
-inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
-
-" Use <TAB> to select the popup menu:
-inoremap <expr> <Tab> pumvisible() ? "\<c-y>" : "\<Tab>"
-inoremap <silent> <expr> <Tab> ncm2_ultisnips#expand_or("\<c-y>", 'n')
-"let g:UltiSnipsJumpForwardTrigger	= "<c-j>"
-"let g:UltiSnipsJumpBackwardTrigger	= "<c-k>"
-let g:UltiSnipsRemoveSelectModeMappings = 0
-let g:UltiSnipsExpandTrigger = '<c-j>'
 
 augroup PackFTLoad
 	autocmd!
@@ -95,7 +116,7 @@ augroup PackFTLoad
   autocmd FileType css,scss,sass,vue packadd ncm2-cssomni
   " Ultisnips extras per filetype
   autocmd FileType css,scss,sass UltiSnipsAddFiletypes css
-  autocmd FileType vue UltiSnipsAddFiletypes vue
+  autocmd FileType vue UltiSnipsAddFiletypes vue,js,css,scss
   autocmd FileType css,scss,sass,vue packadd vim-css3-syntax
   autocmd FileType css,scss,sass,vue packadd scss-syntax.vim
 augroup END
