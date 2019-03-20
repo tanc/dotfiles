@@ -1,0 +1,1 @@
+/Users/tanc/.config/nvim/pack/minpac/start/fzf/shell/key-bindings.fish

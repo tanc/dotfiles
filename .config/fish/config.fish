@@ -12,6 +12,6 @@ rvm default
 
 set -x GPG_TTY (tty)
 set PATH $PATH $HOME/.composer/vendor/bin
-set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
+#set -U fish_user_paths "/usr/local/sbin" $fish_user_paths
 # set -g fish_user_paths "/usr/local/opt/php@5.6/bin" $fish_user_paths
 # set -g fish_user_paths "/usr/local/opt/php@5.6/sbin" $fish_user_paths

@@ -9,8 +9,8 @@ fisherman/getopts
 fisherman/gitignore
 fisherman/humanize_duration
 fisherman/imgcat
-fisherman/nvm
 fisherman/spin
 oh-my-fish/plugin-tab
 oh-my-fish/plugin-thefuck
 fisherman/transfer
+jorgebucaran/fish-nvm
