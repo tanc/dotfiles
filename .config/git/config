@@ -1,6 +1,6 @@
 [user]
-  name = tanc
-  email = mail@tanc.me
+	name = Tancredi D'Onofrio
+	email = mail@tanc.me
 
 [github]
   user = tanc
@@ -44,9 +44,12 @@
   rmtag = "!sh -c 'git tag -d $1; git push origin :refs/tags/$1'"
 
   pr = "!f() { git fetch -fu ${2:-origin} refs/pull/$1/head:pr/$1; } ; f"
+	pushd = push -u origin HEAD
+  pu = ![[ $(git config "branch.$(git symbolic-ref --short HEAD).merge") = '' ]] && git push -u origin $(git symbolic-ref --short HEAD) || git push
+	alias = ! git config --get-regexp ^alias\\. | sed -e s/^alias\\.// -e s/\\ /\\ =\\ /
 
 [push]
-  default = current
+	default = current
 
 [color]
   ui = true

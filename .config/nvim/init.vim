@@ -32,7 +32,7 @@ call minpac#add('2072/PHP-Indenting-for-VIm')
 call minpac#add('tanc/vdebug', {'branch': 'phpstorm-style'})
 call minpac#add('posva/vim-vue')
 call minpac#add('phpactor/phpactor',  {'do': '!composer install', 'for': 'php', 'type': 'opt'})
-call minpac#add('lumiliet/vim-twig', {'for': 'twig'})
+call minpac#add('nelsyeung/twig.vim', {'for': 'twig'})
 call minpac#add('w0rp/ale')
 call minpac#add('maximbaz/lightline-ale')
 call minpac#add('cj/vim-webdevicons')
@@ -231,6 +231,7 @@ augroup module
   autocmd BufRead,BufNewFile *.install set filetype=php
   autocmd BufRead,BufNewFile *.test set filetype=php
   autocmd BufRead,BufNewFile *.inc set filetype=php
+  autocmd BufRead,BufNewFile *.theme set filetype=php
   autocmd BufRead,BufNewFile *.profile set filetype=php
   autocmd BufRead,BufNewFile *.view set filetype=php
 augroup END
@@ -251,9 +252,9 @@ set fillchars+=vert:\
 
 " Location of swap, backup, undo files
 set undofile
-set backupdir=.backup/,~/.config/nvim/.backup/,/tmp//
-set directory=.swp/,~/.config/nvim/.swp/,/tmp//
-set undodir=.undo/,~/.config/nvim/.undo/,/tmp//
+set backupdir=~/.config/nvim/.backup//
+set directory=~/.config/nvim/.swp//
+set undodir=~/.config/nvim/.undo//
 
 " open devdocs.io with firefox and search the word under the cursor
 command! -nargs=? DevDocs :call system('type -p open >/dev/null 2>&1 && open https://devdocs.io/#q=<args> || firefox -url https://devdocs.io/#q=<args>')
