@@ -1,0 +1,101 @@
+#
+# .zshrc is sourced in interactive shells.
+# It should contain commands to set up aliases,
+# functions, options, key bindings, etc.
+#
+
+autoload -U compinit
+compinit
+
+#allow tab completion in the middle of a word
+setopt COMPLETE_IN_WORD
+
+## keep background processes at full speed
+#setopt NOBGNICE
+## restart running processes on exit
+#setopt HUP
+
+## history
+setopt APPEND_HISTORY
+## for sharing history between zsh processes
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
+setopt EXTENDED_HISTORY
+
+HISTFILE=~/.zsh_history
+HISTSIZE=500000
+SAVEHIST=500000
+HIST_STAMPS="yyyy-mm-dd"
+
+## never ever beep ever
+setopt NO_BEEP
+
+## automatically decide when to page a list of completions
+#LISTMAX=0
+
+## disable mail checking
+#MAILCHECK=0
+
+# aliases
+
+alias ll="eza -lagmF --icons=always --color-scale=age -o --no-permissions --git"
+alias rg='rg --hidden --no-follow --max-columns 255 --no-heading --column -F'
+alias dc="docker-compose"
+alias vi="nvim"
+alias vim="nvim"
+alias gfuz='git ls-files -m -o --exclude-standard | fzf --print0 -m -1 | xargs -0 -t -r'
+alias ask="llm"
+alias ask-local="llm -m qwen2.5:7b"
+alias ask-code="llm -m openrouter/qwen/qwen-2.5-coder-32b-instruct"
+alias history="history -t '%Y-%m-%d'"
+
+ga(){
+  if [ $# -eq 0 ]; then
+    gfuz git add
+  else
+    git add "$@"
+  fi
+}
+
+drush(){
+  if ddev describe &> /dev/null; then
+    ddev drush "$@"
+  else
+    docker-compose exec php drush "$@"
+  fi
+}
+
+export NVM_DIR="$HOME/.nvm"
+  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+
+# autoload -U colors
+#colors
+source /home/linuxbrew/.linuxbrew/opt/spaceship/spaceship.zsh
+
+source /home/tanc/.config/zsh/vendor-completions/_ddev/ddev_zsh_completion.sh
+
+# plugins
+source /home/linuxbrew/.linuxbrew/share/antigen/antigen.zsh
+
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle zsh-users/zsh-history-substring-search
+
+antigen apply
+
+# zsh-history-substring-search configuration
+bindkey '^[[A' history-substring-search-up # or '\eOA'
+bindkey '^[[B' history-substring-search-down # or '\eOB'
+
+HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
+HISTORY_SUBSTRING_SEARCH_FUZZY=1
+### bling.sh source start
+test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/bling.sh
+### bling.sh source end
