@@ -43,6 +43,8 @@ eval "$(zoxide init zsh)"
 ## disable mail checking
 #MAILCHECK=0
 
+path+=('/var/home/tanc/.cargo/bin')
+
 # aliases
 
 alias ll="eza -lagmF --icons=always --color-scale=age -o --no-permissions --git"
@@ -56,6 +58,7 @@ alias ask-local="llm -m qwen2.5:7b"
 alias ask-code="llm -m openrouter/qwen/qwen-2.5-coder-32b-instruct"
 alias history="history -t '%Y-%m-%d'"
 alias docker-compose="docker compose"
+alias rm=/var/home/tanc/.local/bin/rm.sh
 
 # aliases that rely on installed commands
 if command -v z > /dev/null 2>&1; then
@@ -72,6 +75,11 @@ ga(){
 
 export VISUAL=nvim
 export EDITOR="$VISUAL"
+
+export LUMEN_AI_PROVIDER="ollama"
+# export LUMEN_AI_MODEL="qwen2.5-coder:7b"
+export LUMEN_AI_MODEL="phi4-mini:latest"
+
 # kitty ssh fix
 [[ "$TERM" == "xterm-kitty" ]] && alias ssh="TERM=xterm-256color ssh" 
 
@@ -97,7 +105,8 @@ if [[ -f "/home/linuxbrew/.linuxbrew/share/antigen/antigen.zsh" ]]; then
   source /home/linuxbrew/.linuxbrew/share/antigen/antigen.zsh
   antigen bundle zsh-users/zsh-completions
   antigen bundle oknowton/zsh-dwim
-  antigen theme spaceship-prompt/spaceship-prompt
+  antigen theme starship/starship
+  # antigen theme spaceship-prompt/spaceship-prompt
   antigen bundle zsh-users/zsh-syntax-highlighting
   antigen bundle zsh-users/zsh-autosuggestions
   antigen bundle zsh-users/zsh-history-substring-search
@@ -112,7 +121,8 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 HISTORY_SUBSTRING_SEARCH_FUZZY=1
 
 EDITOR=nvim
-ZSH_THEME="spaceship"
+ZSH_THEME="starship"
+eval "$(starship init zsh)"
 ### bling.sh source start
 # test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/bling.sh
 ### bling.sh source end
