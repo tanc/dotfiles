@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=Development;
+Comment=Windsurf
+Exec=/var/home/tanc/.local/share/Windsurf/windsurf
+TryExec=/var/home/tanc/.local/share/Windsurf/windsurf
+Icon=/var/home/tanc/.local/share/Windsurf/resources/app/resources/linux/code.png
+
+Name=Windsurf
+Terminal=false
+Type=Application
