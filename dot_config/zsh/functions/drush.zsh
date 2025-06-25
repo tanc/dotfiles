@@ -21,7 +21,6 @@ function drush() {
     echo "❌ Could not determine the PHP service name from docker-compose.yml."
     return 1
   fi
-  echo "Detected PHP service name: $php_service_name"
 
   # Try using docker ps to find the PHP container
   # Adjust the project name to match your container naming convention
@@ -36,11 +35,9 @@ function drush() {
   if [ -z "$php_container" ]; then
     echo "❌ Could not find a running PHP container to execute drush."
     return 1
-  else
-    echo "Found PHP container: $php_container"
   fi
 
   # Execute drush in the found container
-  docker exec -it "$php_container" drush "$@"
+  docker exec -i "$php_container" drush "$@"
 }
 
