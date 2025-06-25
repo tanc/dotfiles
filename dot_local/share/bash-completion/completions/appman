@@ -1,0 +1,1 @@
+complete -W "$(cat /var/home/tanc/.local/share/AM/list 2>/dev/null)" appman
