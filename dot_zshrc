@@ -44,6 +44,7 @@ eval "$(zoxide init zsh)"
 #MAILCHECK=0
 
 path+=('/var/home/tanc/.cargo/bin')
+path+=('/var/home/tanc/.config/composer/vendor/bin')
 
 # aliases
 
@@ -75,7 +76,6 @@ ga(){
 
 export VISUAL=nvim
 export EDITOR="$VISUAL"
-
 export LUMEN_AI_PROVIDER="ollama"
 # export LUMEN_AI_MODEL="qwen2.5-coder:7b"
 export LUMEN_AI_MODEL="phi4-mini:latest"
@@ -101,21 +101,122 @@ if [[ -f "/home/tanc/.config/zsh/vendor-completions/_ddev/ddev_zsh_completion.sh
 fi
 
 # Plugins
-if [[ -f "/home/linuxbrew/.linuxbrew/share/antigen/antigen.zsh" ]]; then
-  source /home/linuxbrew/.linuxbrew/share/antigen/antigen.zsh
-  antigen bundle zsh-users/zsh-completions
-  antigen bundle oknowton/zsh-dwim
-  antigen theme starship/starship
-  # antigen theme spaceship-prompt/spaceship-prompt
-  antigen bundle zsh-users/zsh-syntax-highlighting
-  antigen bundle zsh-users/zsh-autosuggestions
-  antigen bundle zsh-users/zsh-history-substring-search
-  antigen apply
-fi
+# if [[ -f "/home/linuxbrew/.linuxbrew/share/antigen/antigen.zsh" ]]; then
+#  source /home/linuxbrew/.linuxbrew/share/antigen/antigen.zsh
+#  antigen bundle zsh-users/zsh-completions
+#  antigen bundle oknowton/zsh-dwim
+#  antigen theme starship/starship
+#  # antigen theme spaceship-prompt/spaceship-prompt
+#  antigen bundle zsh-users/zsh-syntax-highlighting
+#  # antigen bundle zsh-users/zsh-autosuggestions
+#  # antigen bundle zsh-users/zsh-history-substring-search
+#  antigen bundle marlonrichert/zsh-autocomplete
+#  antigen apply
+# fi
 
-# zsh-history-substring-search configuration
-bindkey '^[[A' history-substring-search-up # or '\eOA'
-bindkey '^[[B' history-substring-search-down # or '\eOB'
+# Download Znap, if it's not there yet.
+[[ -d ~/.config/zsh/repos/znap ]] || \
+    git clone --depth 1 -- \
+        https://github.com/marlonrichert/zsh-snap.git ~/.config/zsh/repos/znap
+
+source ~/.config/zsh/repos/znap/znap.zsh  # Start Znap
+
+znap install zsh-users/zsh-completions
+znap install oknowton/zsh-dwim
+znap install starship/starship
+znap install zsh-users/zsh-syntax-highlighting
+znap install zsh-users/zsh-autosuggestions
+znap install zsh-users/zsh-history-substring-search
+znap install marlonrichert/zsh-autocomplete
+
+znap source zsh-users/zsh-syntax-highlighting
+znap source oknowton/zsh-dwim
+znap source zsh-users/zsh-autosuggestions
+znap source marlonrichert/zsh-autocomplete
+znap source zsh-users/zsh-history-substring-search
+
+# --- Custom Keybindings for zsh-autosuggestions, zsh-history-substring-search, and zsh-autocomplete ---
+
+# Ensure ZLE is ready (usually not needed with plugin managers like znap)
+# autoload -Uz zle && zle -N zle-line-init && zle -N zle-keymap-select
+
+# --- zsh-autosuggestions ---
+# Accept suggestion with Right Arrow.
+# Note: 'forward-char' (which right arrow often sends) is usually in ZSH_AUTOSUGGEST_ACCEPT_WIDGETS by default.
+# Explicit binding for clarity or if default doesn't work:
+bindkey "${terminfo[kcuf1]}" autosuggest-accept  # Right arrow (->) to accept suggestion
+
+# --- zsh-autocomplete ---
+# When zsh-autocomplete menu is active (keymap 'menuselect'):
+# Up arrow to navigate up in the menu.
+bindkey -M menuselect "${terminfo[kcuu1]}" reverse-menu-complete
+# Down arrow to navigate down in the menu.
+bindkey -M menuselect "${terminfo[kcud1]}" menu-complete
+# Enter key to accept the selection from the menu and execute.
+bindkey -M menuselect '^M' .accept-line
+# Shift-Tab in menu to navigate up (reverse cycle).
+bindkey -M menuselect "${terminfo[kcbt]}" reverse-menu-complete
+# Escape key to close autocomplete menu without selection.
+bindkey -M menuselect '^[' send-break
+
+
+# --- Custom Tab key behavior ---
+# This custom widget handles Tab key presses:
+# 1. If an autosuggestion is available, Tab accepts it.
+# 2. If in zsh-autocomplete's menu, Tab selects the current item (inserts it without executing).
+# 3. Otherwise, Tab triggers standard completion (which zsh-autocomplete uses).
+_custom_tab_handler() {
+  # First check if we're in the menuselect context
+  if [[ "$CONTEXT" == "menuselect" ]]; then
+    # In zsh-autocomplete's menu: Tab should "select (but not enter the command)"
+    echo "insert-unambiguous-or-complete"
+    zle insert-unambiguous-or-complete
+    return
+  fi
+  
+  # Check if there's an autosuggestion and accept it if present
+  # Using the same widget that right arrow uses for consistency
+  #if [[ -n "${POSTDISPLAY}" ]]; then
+    # POSTDISPLAY contains the suggestion text that appears after cursor
+    # This is more reliable than checking ZSH_AUTOSUGGEST_SUGGESTION
+    # zle forward-word
+  #  return
+  #fi
+  
+  # No autosuggestion available, fall back to standard completion
+  zle expand-or-complete
+}
+zle -N _custom_tab_handler
+bindkey '^I' _custom_tab_handler # Bind Tab to the custom handler
+
+# --- Custom Arrow Key Handlers for HSS and Autocomplete ---
+_custom_down_arrow_handler() {
+  # More reliable way to check if we're actively using history-substring-search
+  # Only consider HSS active if we've explicitly used it via up arrow first
+  # AND the current buffer exactly matches the last HSS result
+  if [[ -n "$_history_substring_search_result" && \
+        -n "$_history_substring_search_query" && \
+        "$BUFFER" == "$_history_substring_search_result" && \
+        "$LASTWIDGET" == "history-substring-search-up" ]]; then
+    # We're actively cycling through HSS results, continue with HSS
+    zle history-substring-search-down
+  else
+    # We're not in HSS, or HSS hasn't been activated yet
+    # Always use menu-select to show the completion menu
+    zle menu-select
+  fi
+}
+zle -N _custom_down_arrow_handler
+
+# Bind Up arrow for HSS
+bindkey '^[[A' history-substring-search-up
+bindkey '^[OA' history-substring-search-up
+
+# Bind Down arrow to our custom handler
+bindkey '^[[B' _custom_down_arrow_handler
+bindkey '^[OB' _custom_down_arrow_handler
+
+# --- End of Custom Keybindings ---
 
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 HISTORY_SUBSTRING_SEARCH_FUZZY=1
@@ -126,3 +227,7 @@ eval "$(starship init zsh)"
 ### bling.sh source start
 # test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/bling.sh
 ### bling.sh source end
+autoload bashcompinit
+bashcompinit
+source "/var/home/tanc/.local/share/bash-completion/completions/appman"
+export PATH="/usr/bin:$PATH"
