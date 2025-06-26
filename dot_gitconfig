@@ -1,0 +1,32 @@
+[alias]
+	co = checkout
+	s = status
+	l = log
+	unstage = reset HEAD --
+	amend = commit --amend
+	authors-list = shortlog -e -s -n
+	authors-count = shortlog -s -n
+	cob = checkout -b
+	smartlog = log --graph --pretty=format:'commit: %C(bold red)%h%Creset %C(red)<%H>%Creset %C(bold magenta)%d %Creset%ndate: %C(bold yellow)%cd %Creset%C(yellow)%cr%Creset%nauthor: %C(bold blue)%an%Creset %C(blue)<%ae>%Creset%n%C(cyan)%s%n%Creset'
+  sl = !git smartlog
+  me = !git smartlog --author='Tanc*'
+	log-commit = log -1 --pretty=format:'commit: %C(bold red)%h%Creset %C(red)<%H>%Creset %C(bold magenta)%d %Creset%ndate: %C(bold yellow)%cd %Creset%C(yellow)%cr%Creset%nauthor: %C(bold blue)%an%Creset %C(blue)<%ae>%Creset%n%n%C(bold cyan)%s%n%n%C(cyan)%b%n%Creset'
+	logcm = !git log-commit
+	ls = log --oneline
+	nuke = reset --hard
+	purge = clean -fd
+	revertfile = checkout --
+	uncommit = reset --soft HEAD^
+[user]
+	email = mail@tanc.me
+	name = Tanc
+[push]
+	autoSetupRemote = 1
+[core]
+	excludesFile = ~/.gitignore
+[tag]
+	sort = version:refname
+[pull]
+	rebase = true
+[init]
+	defaultBranch = main
