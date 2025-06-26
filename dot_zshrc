@@ -35,7 +35,36 @@ HIST_STAMPS="yyyy-mm-dd"
 
 ## never ever beep ever
 setopt NO_BEEP
-eval "$(zoxide init zsh)"
+#eval "$(zoxide init zsh)"
+
+z() {
+  local old_pwd="$PWD"
+  local new_pwd
+  
+  # Handle special cases and existing paths directly
+  if [[ "$1" == ".." || "$1" == "-" || -d "$1" ]]; then
+    cd "$@" || return
+  # Check if the path exists relative to any parent directory
+  elif [[ -d "$HOME/$1" ]]; then
+    cd "$HOME/$1" || return
+  elif [[ -d "$PWD/../$1" ]]; then
+    cd "$PWD/../$1" || return
+  # Check if it exists in common directories
+  elif [[ -d "$HOME/Sites/$1" ]]; then
+    cd "$HOME/Sites/$1" || return
+  else
+    # Fall back to zoxide for directory jumping
+    local target
+    target="$(zoxide query -- "$@")" || return
+    cd "$target" || return
+  fi
+  
+  # Update zoxide database with the new directory
+  new_pwd="$PWD"
+  if [[ "$old_pwd" != "$new_pwd" ]]; then
+    zoxide add "$new_pwd"
+  fi
+}
 
 ## automatically decide when to page a list of completions
 #LISTMAX=0
@@ -45,9 +74,10 @@ eval "$(zoxide init zsh)"
 
 path+=('/var/home/tanc/.cargo/bin')
 path+=('/var/home/tanc/.config/composer/vendor/bin')
+path+=('/var/home/tanc/.local/opt')
+path+=('/var/home/tanc/.local/bin')
 
 # aliases
-
 alias ll="eza -lagmF --icons=always --color-scale=age -o --no-permissions --git"
 alias rg='rg --hidden --no-follow --max-columns 255 --no-heading --column -F'
 alias dc="docker compose"
@@ -60,6 +90,7 @@ alias ask-code="llm -m openrouter/qwen/qwen-2.5-coder-32b-instruct"
 alias history="history -t '%Y-%m-%d'"
 alias docker-compose="docker compose"
 alias rm=/var/home/tanc/.local/bin/rm.sh
+alias ..="cd .."
 
 # aliases that rely on installed commands
 if command -v z > /dev/null 2>&1; then
@@ -127,14 +158,17 @@ znap install starship/starship
 znap install zsh-users/zsh-syntax-highlighting
 znap install zsh-users/zsh-autosuggestions
 znap install zsh-users/zsh-history-substring-search
-znap install marlonrichert/zsh-autocomplete
+# znap install marlonrichert/zsh-autocomplete
 
 znap source zsh-users/zsh-syntax-highlighting
 znap source oknowton/zsh-dwim
 znap source zsh-users/zsh-autosuggestions
-znap source marlonrichert/zsh-autocomplete
+#znap source marlonrichert/zsh-autocomplete
 znap source zsh-users/zsh-history-substring-search
 
+#znap prompt
+#znap eval starship 'starship init zsh --print-full-init'
+#znap prompt
 # --- Custom Keybindings for zsh-autosuggestions, zsh-history-substring-search, and zsh-autocomplete ---
 
 # Ensure ZLE is ready (usually not needed with plugin managers like znap)
@@ -144,20 +178,20 @@ znap source zsh-users/zsh-history-substring-search
 # Accept suggestion with Right Arrow.
 # Note: 'forward-char' (which right arrow often sends) is usually in ZSH_AUTOSUGGEST_ACCEPT_WIDGETS by default.
 # Explicit binding for clarity or if default doesn't work:
-bindkey "${terminfo[kcuf1]}" autosuggest-accept  # Right arrow (->) to accept suggestion
+#bindkey "${terminfo[kcuf1]}" autosuggest-accept  # Right arrow (->) to accept suggestion
 
 # --- zsh-autocomplete ---
 # When zsh-autocomplete menu is active (keymap 'menuselect'):
 # Up arrow to navigate up in the menu.
-bindkey -M menuselect "${terminfo[kcuu1]}" reverse-menu-complete
+#bindkey -M menuselect "${terminfo[kcuu1]}" reverse-menu-complete
 # Down arrow to navigate down in the menu.
-bindkey -M menuselect "${terminfo[kcud1]}" menu-complete
+#bindkey -M menuselect "${terminfo[kcud1]}" menu-complete
 # Enter key to accept the selection from the menu and execute.
-bindkey -M menuselect '^M' .accept-line
+#bindkey -M menuselect '^M' .accept-line
 # Shift-Tab in menu to navigate up (reverse cycle).
-bindkey -M menuselect "${terminfo[kcbt]}" reverse-menu-complete
+#bindkey -M menuselect "${terminfo[kcbt]}" reverse-menu-complete
 # Escape key to close autocomplete menu without selection.
-bindkey -M menuselect '^[' send-break
+#bindkey -M menuselect '^[' send-break
 
 
 # --- Custom Tab key behavior ---
@@ -186,8 +220,8 @@ _custom_tab_handler() {
   # No autosuggestion available, fall back to standard completion
   zle expand-or-complete
 }
-zle -N _custom_tab_handler
-bindkey '^I' _custom_tab_handler # Bind Tab to the custom handler
+#zle -N _custom_tab_handler
+#bindkey '^I' _custom_tab_handler # Bind Tab to the custom handler
 
 # --- Custom Arrow Key Handlers for HSS and Autocomplete ---
 _custom_down_arrow_handler() {
@@ -206,15 +240,15 @@ _custom_down_arrow_handler() {
     zle menu-select
   fi
 }
-zle -N _custom_down_arrow_handler
+#zle -N _custom_down_arrow_handler
 
 # Bind Up arrow for HSS
 bindkey '^[[A' history-substring-search-up
 bindkey '^[OA' history-substring-search-up
 
 # Bind Down arrow to our custom handler
-bindkey '^[[B' _custom_down_arrow_handler
-bindkey '^[OB' _custom_down_arrow_handler
+bindkey '^[[B' history-substring-search-down
+bindkey '^[OB' history-substring-search-down
 
 # --- End of Custom Keybindings ---
 
